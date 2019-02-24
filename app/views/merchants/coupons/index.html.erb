@@ -1,0 +1,24 @@
+<h3>My Coupons</h3>
+
+<%= link_to 'Add New Coupon', new_dashboard_coupon_path %>
+
+<% @coupons.each do |coupon| %>
+<section id="coupon-<%= coupon.id %>">
+<p>Coupon Code: <%= coupon.code %></p>
+  <% if coupon.percentage %>
+    <p>Coupon Discount: <%= coupon.dollar.round %>%</p>
+  <% else %>
+    <p>Coupon Discount: <%= number_to_currency(coupon.dollar) %></p>
+  <% end %>
+  <p><%= link_to 'Edit Coupon', edit_dashboard_coupon_path(coupon) %></p>
+  <p><% if coupon.active %>
+    <%= button_to 'Disable Coupon', dashboard_disable_coupon_path(coupon), method: :put %>
+  <% else %>
+    <%= button_to 'Enable Coupon', dashboard_enable_coupon_path(coupon), method: :put %>
+  <% end %>
+  <p><% if coupon.never_used? %>
+  <%= button_to 'Delete Coupon', dashboard_coupon_path(coupon), method: :delete %>
+  <% end %>
+  </p>
+  </section>
+<% end %>
