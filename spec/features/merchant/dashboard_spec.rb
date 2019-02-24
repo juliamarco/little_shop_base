@@ -89,5 +89,14 @@ RSpec.describe 'merchant dashboard' do
         expect(current_path).to eq(admin_merchant_items_path(@merchant))
       end
     end
+
+    describe 'show a link to manage my coupons' do
+      scenario 'as a merchant' do
+        allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+        visit dashboard_path
+        click_link('My Coupons')
+        expect(current_path).to eq(dashboard_coupons_path)
+      end
+    end
   end
 end
