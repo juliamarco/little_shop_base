@@ -32,6 +32,17 @@ class Merchants::CouponsController < ApplicationController
     @form_path = [:dashboard, @coupon]
   end
 
+  def destroy
+    @merchant = current_user
+    @coupon = Coupon.find(params[:id])
+    if @coupon && @coupon.never_used?
+      @coupon.destroy
+    else
+      flash[:error] = "You cannot delete coupon: #{@coupon.code}!"
+    end
+    redirect_to dashboard_coupons_path
+  end
+
   def update
     @merchant = current_user
     @coupon = Coupon.find(params[:id])
@@ -59,6 +70,7 @@ class Merchants::CouponsController < ApplicationController
     coupon.save
     redirect_to dashboard_coupons_path
   end
+
 
   private
 

@@ -133,7 +133,35 @@ describe "Merchant Dashboard Coupons page" do
         expect(page).to have_content("Coupon Code: New #{@coupon_1.code}")
         expect(page).to have_content("Coupon Discount: $123")
       end
+    end
 
+    it "lets me delete an existing coupon if it hasn't been used" do
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+      @am_admin = false
+      visit dashboard_coupons_path
+
+      within "#coupon-#{@coupon_1.id}" do
+        click_button 'Delete Coupon'
+      end
+
+      expect(page).to_not have_css("#coupon-#{@coupon_1.id}")
+      expect(page).to_not have_content(@coupon_1.code)
+    end
+
+    it "Does not let me delete an existing coupon if it has been used" do
+      user = create(:user, state: "IA", city: "Des Moines")
+      order = create(:completed_order, user: user, coupon: @coupon_1)
+
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+      @am_admin = false
+      visit dashboard_coupons_path
+
+      within "#coupon-#{@coupon_1.id}" do
+        click_button 'Delete Coupon'
+      end
+
+      expect(page).to have_css("#coupon-#{@coupon_1.id}")
+      expect(page).to have_content("You cannot delete coupon: #{@coupon_1.code}!")
     end
   end
 end
