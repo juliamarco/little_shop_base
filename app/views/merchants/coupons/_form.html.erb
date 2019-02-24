@@ -1,0 +1,25 @@
+<% if @coupon %>
+  <% if @coupon.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@coupon.errors.count, "error") %> prohibited this coupon from being saved:</h2>
+      <ul>
+        <% @coupon.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% else %>
+    <%= form_for @form_path do |f| %>
+      <p><%= f.label :code, "Coupon code" %>
+      <%= f.text_field :code, required: true %></p>
+
+      <p><%= f.label :percentage, "Type of discount" %>
+      <%= f.select :percentage, options_for_select(['Percent', 'Dollars']), class: 'form-control' %></p>
+
+      <p><%= f.label :dollar, "Amount" %>
+      <%= f.number_field :dollar, min: 0.01, step: :any %></p>
+
+      <p><%= f.submit %></p>
+    <% end %>
+  <% end %>
+<% end %>

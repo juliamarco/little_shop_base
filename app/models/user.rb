@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   # as a user
   has_many :orders
+  has_many :coupons, foreign_key: 'merchant_id'
   has_many :order_items, through: :orders
   # as a merchant
   has_many :items, foreign_key: 'merchant_id'
@@ -146,5 +147,9 @@ class User < ApplicationRecord
          .select('users.name, sum(order_items.quantity * order_items.price) AS total')
          .order('total DESC')
          .limit(limit)
+  end
+
+  def too_many_coupons?
+    coupons.count >= 5
   end
 end
