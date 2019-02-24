@@ -9,4 +9,5 @@ class Coupon < ApplicationRecord
   def never_used?
     orders.empty?
   end
+
 end
