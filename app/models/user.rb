@@ -152,4 +152,8 @@ class User < ApplicationRecord
   def too_many_coupons?
     coupons.count >= 5
   end
+
+  def used_coupon?(coupon)
+    orders.where(coupon_id: coupon.id).exists?
+  end
 end

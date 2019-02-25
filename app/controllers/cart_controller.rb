@@ -1,9 +1,10 @@
 class CartController < ApplicationController
-  before_action :visitor_or_user
+before_action :visitor_or_user
   include ActionView::Helpers::TextHelper
 
   def show
     @items = @cart.items
+    @coupon = session[:coupon] && Coupon.find(session[:coupon])
   end
 
   def destroy

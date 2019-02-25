@@ -83,6 +83,22 @@ RSpec.describe Cart do
     expect(cart.subtotal(item_1.id)).to eq(item_1.price * cart.total_item_count)
   end
 
+  it '.subtotal_discounted' do
+    merchant = create(:merchant)
+    coupon = merchant.coupons.create!(code: "123", dollar: 2.0, percentage: false)
+    coupon_2 = merchant.coupons.create!(code: "234", dollar: 25.0, percentage: true)
+
+    item_1 = create(:item)
+    cart = Cart.new({})
+    cart.add_item(item_1.id)
+    cart.add_item(item_1.id)
+    cart.add_item(item_1.id)
+    cart.add_item(item_1.id)
+
+    expect(cart.subtotal_discounted(coupon, item_1.id)).to eq(10)
+    expect(cart.subtotal_discounted(coupon_2, item_1.id)).to eq(9)
+  end
+
   it '.grand_total' do
     item_1, item_2 = create_list(:item, 2)
     cart = Cart.new({})
