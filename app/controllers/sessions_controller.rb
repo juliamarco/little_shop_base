@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController
+
   def new
     if current_user
       redirect_by_role
@@ -12,6 +13,7 @@ class SessionsController < ApplicationController
         session[:user_id] = @user.id
         redirect_by_role
       else
+        flash[:error] = 'Your account is inactive, contact an admin for help'
         flash[:error] = 'Your account is inactive, contact an admin for help'
         render :new
       end

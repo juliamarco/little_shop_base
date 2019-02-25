@@ -44,14 +44,13 @@ RSpec.describe User, type: :model do
         i5 = create(:item, merchant_id: @m5.id)
         i6 = create(:item, merchant_id: @m6.id)
         i7 = create(:item, merchant_id: @m7.id)
-        coupon = @m1.coupons.create(code: "123", dollar: 9.0)
-        o1 = create(:completed_order, user: u1, coupon: coupon)
-        o2 = create(:completed_order, user: u2, coupon: coupon)
-        o3 = create(:completed_order, user: u3, coupon: coupon)
-        o4 = create(:completed_order, user: u1, coupon: coupon)
-        o5 = create(:cancelled_order, user: u5, coupon: coupon)
-        o6 = create(:completed_order, user: u6, coupon: coupon)
-        o7 = create(:completed_order, user: u6, coupon: coupon)
+        o1 = create(:completed_order, user: u1)
+        o2 = create(:completed_order, user: u2)
+        o3 = create(:completed_order, user: u3)
+        o4 = create(:completed_order, user: u1)
+        o5 = create(:cancelled_order, user: u5)
+        o6 = create(:completed_order, user: u6)
+        o7 = create(:completed_order, user: u6)
         oi1 = create(:fulfilled_order_item, item: i1, order: o1, created_at: 1.days.ago)
         oi2 = create(:fulfilled_order_item, item: i2, order: o2, created_at: 7.days.ago)
         oi3 = create(:fulfilled_order_item, item: i3, order: o3, created_at: 6.days.ago)
@@ -122,13 +121,12 @@ RSpec.describe User, type: :model do
       @i7 = create(:item, merchant_id: @m1.id, inventory: 20)
       @i9 = create(:item, merchant_id: @m1.id, inventory: 20)
       @i8 = create(:item, merchant_id: @m2.id, inventory: 20)
-      coupon = @m1.coupons.create(code: "123", dollar: 9.0)
-      o1 = create(:completed_order, user: @u1, coupon: coupon)
-      o2 = create(:completed_order, user: @u2, coupon: coupon)
-      o3 = create(:completed_order, user: @u3, coupon: coupon)
-      o4 = create(:completed_order, user: @u1, coupon: coupon)
-      o5 = create(:cancelled_order, user: u5, coupon: coupon)
-      o6 = create(:completed_order, user: u6, coupon: coupon)
+      o1 = create(:completed_order, user: @u1)
+      o2 = create(:completed_order, user: @u2)
+      o3 = create(:completed_order, user: @u3)
+      o4 = create(:completed_order, user: @u1)
+      o5 = create(:cancelled_order, user: u5)
+      o6 = create(:completed_order, user: u6)
       @oi1 = create(:order_item, item: @i1, order: o1, quantity: 2, created_at: 1.days.ago)
       @oi2 = create(:order_item, item: @i2, order: o2, quantity: 8, created_at: 7.days.ago)
       @oi3 = create(:order_item, item: @i2, order: o3, quantity: 6, created_at: 7.days.ago)
@@ -221,6 +219,19 @@ RSpec.describe User, type: :model do
 
       coupon_5 = merchant.coupons.create!(code: "567", dollar: 9.0, percentage: true)
       expect(merchant.too_many_coupons?).to eq(true)
+    end
+
+    it '.used_coupon?' do
+      merchant = create(:merchant)
+      coupon = merchant.coupons.create!(code: "123", dollar: 9.0, percentage: true)
+
+      user_1 = create(:user, state: "CO", city: "Fairfield")
+      user_2 = create(:user, state: "CO", city: "Denver")
+      order_1 = create(:completed_order, user: user_1, coupon: coupon)
+      order_2 = create(:completed_order, user: user_2)
+
+      expect(user_1.used_coupon?(coupon)).to eq(true)
+      expect(user_2.used_coupon?(coupon)).to eq(false)
     end
   end
 end

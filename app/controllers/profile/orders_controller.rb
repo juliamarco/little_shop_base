@@ -4,6 +4,7 @@ class Profile::OrdersController < ApplicationController
   def index
     @user = current_user
     @orders = Order.where(user: @user)
+    @coupon = session[:coupon] && Coupon.find(session[:coupon])
   end
 
   def create
@@ -23,6 +24,7 @@ class Profile::OrdersController < ApplicationController
 
   def show
     @order = Order.find(params[:id])
+    @coupon = session[:coupon] && Coupon.find(session[:coupon])
   end
 
   def destroy

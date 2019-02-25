@@ -6,6 +6,9 @@ RSpec.describe 'cart workflow', type: :feature do
   before :each do
     @merchant = create(:merchant)
     @item = create(:item, user: @merchant)
+    @item_2 = create(:item, user: @merchant)
+    @coupon = @merchant.coupons.create!(code: "123", dollar: 2.0, percentage: false)
+    @coupon_2 = @merchant.coupons.create!(code: "234", dollar: 50.0, percentage: true)
   end
 
   describe 'shows an empty cart when no items are added' do
@@ -208,6 +211,109 @@ RSpec.describe 'cart workflow', type: :feature do
 
       expect(page).to_not have_button("Add to cart")
     end
+  end
+
+  describe 'as a registered user' do
+    it 'displays me a form to enter a coupon code' do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit item_path(@item)
+      click_button "Add to Cart"
+
+      visit cart_path
+      fill_in :coupon, with: @coupon.code
+      click_button "Submit Coupon"
+
+      expect(page).to have_content("Coupon being used: '#{@coupon.code}'")
+      expect(page).to have_content("Coupon '#{@coupon.code}' successfully applied")
+    end
+
+    it 'applies the coupon dollars and updates subtotal and grand total in cart' do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit item_path(@item)
+      click_button "Add to Cart"
+
+      visit item_path(@item_2)
+      click_button "Add to Cart"
+
+      visit cart_path
+      fill_in :coupon, with: @coupon.code
+      click_button "Submit Coupon"
+
+      expect(page).to have_content("Subtotal: $4.00")
+      expect(page).to have_content("Subtotal: $2.50")
+      expect(page).to have_content("Total: $6.50")
+    end
+
+    it 'applies the coupon percent and updates subtotal and grand total in cart and remembers the discount' do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit item_path(@item)
+      click_button "Add to Cart"
+
+      visit item_path(@item_2)
+      click_button "Add to Cart"
+
+      visit cart_path
+      fill_in :coupon, with: @coupon_2.code
+      click_button "Submit Coupon"
+      expect(page).to have_content("Subtotal: $3.00")
+      expect(page).to have_content("Subtotal: $2.25")
+      expect(page).to have_content("Total: $5.25")
+
+      visit root_path
+      visit cart_path
+
+      expect(page).to have_content("Subtotal: $3.00")
+      expect(page).to have_content("Subtotal: $2.25")
+      expect(page).to have_content("Total: $5.25")
+    end
+
+    it "let's me know if code invalid" do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit item_path(@item)
+      click_button "Add to Cart"
+
+      visit item_path(@item_2)
+      click_button "Add to Cart"
+
+      visit cart_path
+      fill_in :coupon, with: "hola"
+      click_button "Submit Coupon"
+
+      expect(page).to have_content("Code not valid. Try again")
+    end
+
+    it "let's me know if code has been used" do
+      user = create(:user)
+      order = create(:completed_order, user: user, coupon: @coupon)
+
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit item_path(@item)
+      click_button "Add to Cart"
+
+      visit item_path(@item_2)
+      click_button "Add to Cart"
+
+      visit cart_path
+      fill_in :coupon, with: @coupon.code
+      click_button "Submit Coupon"
+
+      expect(page).to have_content("You have already applied coupon '#{@coupon.code}'")
+    end
+
   end
 end
 

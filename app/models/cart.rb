@@ -38,9 +38,25 @@ class Cart
     item.price * count_of(item_id)
   end
 
-  def grand_total
-    @contents.keys.map do |item_id|
-      subtotal(item_id)
-    end.sum
+  def subtotal_discounted(coupon, item_id)
+    original_subtotal = subtotal(item_id)
+    if coupon.percentage?
+      disc = (original_subtotal * coupon.dollar) / 100
+      original_subtotal - disc
+    else
+      original_subtotal - coupon.dollar
+    end
+  end
+
+  def grand_total(coupon = nil)
+    if coupon.nil?
+      @contents.keys.map do |item_id|
+        subtotal(item_id)
+      end.sum
+    else
+      @contents.keys.map do |item_id|
+        subtotal_discounted(coupon, item_id)
+      end.sum
+    end
   end
 end

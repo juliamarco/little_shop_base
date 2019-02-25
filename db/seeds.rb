@@ -5,6 +5,7 @@ include FactoryBot::Syntax::Methods
 OrderItem.destroy_all
 Order.destroy_all
 Item.destroy_all
+Coupon.destroy_all
 User.destroy_all
 
 admin = create(:admin)
@@ -21,9 +22,16 @@ item_2 = create(:item, user: merchant_2)
 item_3 = create(:item, user: merchant_3)
 item_4 = create(:item, user: merchant_4)
 create_list(:item, 10, user: merchant_1)
-
 inactive_item_1 = create(:inactive_item, user: merchant_1)
 inactive_item_2 = create(:inactive_item, user: inactive_merchant_1)
+
+coupon_1 = create(:coupon, user: merchant_1)
+coupon_2 = create(:coupon, user: merchant_2)
+coupon_3 = create(:percent_coupon, user: merchant_3)
+coupon_4 = create(:percent_coupon, user: merchant_4)
+create_list(:coupon, 5, user: merchant_1)
+inactive_coupon_1 = create(:inactive_coupon, user: merchant_1)
+inactive_coupon_2 = create(:inactive_coupon, user: inactive_merchant_1)
 
 Random.new_seed
 rng = Random.new
@@ -48,11 +56,9 @@ create(:fulfilled_order_item, order: order, item: item_1, price: 1, quantity: 1,
 create(:fulfilled_order_item, order: order, item: item_2, price: 2, quantity: 1, created_at: (rng.rand(23)+1).hour.ago, updated_at: rng.rand(59).minutes.ago)
 
 
-
-
-
 puts 'seed data finished'
 puts "Users created: #{User.count.to_i}"
 puts "Orders created: #{Order.count.to_i}"
 puts "Items created: #{Item.count.to_i}"
 puts "OrderItems created: #{OrderItem.count.to_i}"
+puts "Coupons created: #{Coupon.count.to_i}"
