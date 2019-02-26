@@ -40,12 +40,18 @@ class Cart
 
   def subtotal_discounted(coupon, item_id)
     original_subtotal = subtotal(item_id)
-    if coupon.percentage?
-      disc = (original_subtotal * coupon.dollar) / 100
-      original_subtotal - disc
+    item = Item.find(item_id)
+    if item.merchant_id == coupon.merchant_id
+      if coupon.percentage?
+        disc = (original_subtotal * coupon.dollar) / 100
+        total = original_subtotal - disc
+      else
+        total = original_subtotal - coupon.dollar
+      end
     else
-      original_subtotal - coupon.dollar
+      total = original_subtotal
     end
+    [total, 0].max
   end
 
   def grand_total(coupon = nil)

@@ -4,8 +4,9 @@
   <p>Last Update: <%= @order.updated_at %></p>
   <p>Status: <%= @order.status %></p>
   <p>Item Count: <%= @order.total_item_count %></p>
-  <% if @coupon %>
-    <p>Total Cost: <%= number_to_currency(@order.total_cost(@coupon)) %></p>
+  <% if @order.coupon %>
+    <p>Total Cost: <%= number_to_currency(@order.total_cost(@order.coupon)) %></p>
+    <p>Coupon used: '<%= @order.coupon.code %>'</p>
   <% else %>
     <p>Total Cost: <%= number_to_currency(@order.total_cost) %></p>
   <% end %>

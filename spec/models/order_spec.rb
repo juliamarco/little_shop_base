@@ -1,4 +1,4 @@
-require 'rails_helper'
+  require 'rails_helper'
 
 RSpec.describe Order, type: :model do
   describe 'validations' do
@@ -83,7 +83,15 @@ RSpec.describe Order, type: :model do
     end
 
     it '.total_cost' do
+      coupon = @merchant.coupons.create!(code: "123", dollar: 2.0, percentage: false)
+      coupon_2 = @merchant.coupons.create!(code: "234", dollar: 25.0, percentage: true)
+
       expect(@order.total_cost).to eq((@oi_1.quantity*@oi_1.price) + (@oi_2.quantity*@oi_2.price))
+      expect(@order.total_cost).to eq(3)
+      @order.coupon = coupon
+      expect(@order.total_cost(coupon)).to eq(1)
+      @order.coupon = coupon_2
+      expect(@order.total_cost(coupon_2)).to eq(0.75)
     end
 
     it '.total_quantity_for_merchant' do

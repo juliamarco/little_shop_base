@@ -12,21 +12,16 @@ class Order < ApplicationRecord
     order_items.sum(:quantity)
   end
 
-  def original_total_cost
-    oi = order_items.pluck("sum(quantity*price)")
-    oi.sum
-  end
-
   def total_cost(coupon = nil)
-    # binding.pry
-    original = original_total_cost
+    original = order_items.pluck("sum(quantity*price)").sum
     if coupon.nil?
-      original
+      total = original
     elsif coupon.percentage?
-      (original * coupon.dollar) / 100
+      total = ((original * coupon.dollar) / 100)
     else
-      original - coupon.dollar
+      total = (original - coupon.dollar)
     end
+    [total, 0].max
   end
 
   def self.sorted_by_items_shipped(limit = nil)

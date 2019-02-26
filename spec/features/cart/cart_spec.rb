@@ -5,8 +5,10 @@ include ActionView::Helpers::NumberHelper
 RSpec.describe 'cart workflow', type: :feature do
   before :each do
     @merchant = create(:merchant)
+    @merchant_2 = create(:merchant)
     @item = create(:item, user: @merchant)
     @item_2 = create(:item, user: @merchant)
+    @item_3 = create(:item, user: @merchant_2)
     @coupon = @merchant.coupons.create!(code: "123", dollar: 2.0, percentage: false)
     @coupon_2 = @merchant.coupons.create!(code: "234", dollar: 50.0, percentage: true)
   end
@@ -225,8 +227,7 @@ RSpec.describe 'cart workflow', type: :feature do
       visit cart_path
       fill_in :coupon, with: @coupon.code
       click_button "Submit Coupon"
-
-      expect(page).to have_content("Coupon being used: '#{@coupon.code}'")
+ 
       expect(page).to have_content("Coupon '#{@coupon.code}' successfully applied")
     end
 
@@ -291,7 +292,7 @@ RSpec.describe 'cart workflow', type: :feature do
       fill_in :coupon, with: "hola"
       click_button "Submit Coupon"
 
-      expect(page).to have_content("Code not valid. Try again")
+      expect(page).to have_content("Invalid coupon. Try again")
     end
 
     it "let's me know if code has been used" do
@@ -314,6 +315,38 @@ RSpec.describe 'cart workflow', type: :feature do
       expect(page).to have_content("You have already applied coupon '#{@coupon.code}'")
     end
 
+    it 'only updates the item from the merchant the coupon belongs to' do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit item_path(@item_3)
+      click_button "Add to Cart"
+
+      visit cart_path
+      fill_in :coupon, with: @coupon_2.code
+      click_button "Submit Coupon"
+
+      expect(page).to have_content("Subtotal: $1.50")
+      expect(page).to have_content("Subtotal: $6.00")
+    end
+
+    it 'cart should not display a negative value' do
+      coupon = @merchant.coupons.create!(code: "UJK", dollar: 150.0, percentage: true)
+
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+
+      visit cart_path
+      fill_in :coupon, with: coupon.code
+      click_button "Submit Coupon"
+
+      expect(page).to have_content("Total: $0.00")
+    end
   end
 end
 
