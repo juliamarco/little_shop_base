@@ -11,6 +11,12 @@ class SessionsController < ApplicationController
     if @user && @user.authenticate(params[:password])
       if @user.active?
         session[:user_id] = @user.id
+        if session[:coupon]
+          coupon = Coupon.find(session[:coupon])
+          if current_user.used_coupon?(coupon)
+            session.delete
+          end
+        end
         redirect_by_role
       else
         flash[:error] = 'Your account is inactive, contact an admin for help'

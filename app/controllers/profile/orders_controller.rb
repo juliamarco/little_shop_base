@@ -4,7 +4,6 @@ class Profile::OrdersController < ApplicationController
   def index
     @user = current_user
     @orders = Order.where(user: @user)
-    @coupon = session[:coupon] && Coupon.find(session[:coupon])
   end
 
   def create
@@ -16,15 +15,18 @@ class Profile::OrdersController < ApplicationController
         quantity: @cart.count_of(item.id),
         fulfilled: false)
     end
+    if session[:coupon]
+      coupon = Coupon.find(session[:coupon])
+      order.update(coupon: coupon)
+      session.delete(:coupon)
+    end
     session[:cart] = nil
-
     flash[:success] = 'You have successfully checked out!'
     redirect_to profile_orders_path
   end
 
   def show
     @order = Order.find(params[:id])
-    @coupon = session[:coupon] && Coupon.find(session[:coupon])
   end
 
   def destroy

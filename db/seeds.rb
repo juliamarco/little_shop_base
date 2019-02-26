@@ -25,13 +25,12 @@ create_list(:item, 10, user: merchant_1)
 inactive_item_1 = create(:inactive_item, user: merchant_1)
 inactive_item_2 = create(:inactive_item, user: inactive_merchant_1)
 
-coupon_1 = create(:coupon, user: merchant_1)
 coupon_2 = create(:coupon, user: merchant_2)
+coupon_2 = create(:coupon, user: merchant_3)
 coupon_3 = create(:percent_coupon, user: merchant_3)
 coupon_4 = create(:percent_coupon, user: merchant_4)
 create_list(:coupon, 5, user: merchant_1)
-inactive_coupon_1 = create(:inactive_coupon, user: merchant_1)
-inactive_coupon_2 = create(:inactive_coupon, user: inactive_merchant_1)
+inactive_coupon_1 = create(:inactive_coupon, user: merchant_3)
 
 Random.new_seed
 rng = Random.new

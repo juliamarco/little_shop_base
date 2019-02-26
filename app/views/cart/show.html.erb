@@ -19,7 +19,6 @@
       <%= submit_tag 'Submit Coupon' %>
     <% end %>
     <% if @coupon %>
-      <p>Coupon being used: '<%= @coupon.code %>'</p>
       <p>Coupon discount:
         <% if @coupon.percentage? %>
           <p><%= @coupon.dollar.round %>%</p>
