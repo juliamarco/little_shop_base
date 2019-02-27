@@ -17,7 +17,7 @@ class Profile::OrdersController < ApplicationController
     end
     if session[:coupon]
       coupon = Coupon.find(session[:coupon])
-      order.update(coupon: coupon)
+      order.update(coupon: coupon, discounted_total: @cart.grand_total)
       session.delete(:coupon)
     end
     session[:cart] = nil
@@ -27,6 +27,9 @@ class Profile::OrdersController < ApplicationController
 
   def show
     @order = Order.find(params[:id])
+    if @order.coupon
+      @coupon = Coupon.find(@order.coupon.id)
+    end
   end
 
   def destroy

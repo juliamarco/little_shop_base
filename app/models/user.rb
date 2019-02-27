@@ -47,6 +47,7 @@ class User < ApplicationRecord
         .limit(limit)
   end
 
+
   def self.merchants_sorted_by_revenue
     self.joins(:items)
         .joins('join order_items on items.id = order_items.item_id')
@@ -56,6 +57,22 @@ class User < ApplicationRecord
         .group(:id)
         .select('users.*, sum(order_items.quantity * order_items.price) AS total')
         .order("total DESC")
+  end
+
+  def self.with_completed_orders
+    self.joins(:items)
+        .joins('join order_items on items.id = order_items.item_id')
+        .joins('join orders on orders.id = order_items.order_id')
+        .where('orders.status = 1')
+        .where('order_items.fulfilled = true')
+  end
+
+  def self.total_sales
+    chart = {}
+    self.with_completed_orders.each do |merchant|
+      chart[merchant.name] = merchant.total_revenue_items.sum(:price)
+    end
+    chart
   end
 
   def self.merchants_sorted_by_fulfillment_time(order = "ASC", limit)
@@ -91,8 +108,13 @@ class User < ApplicationRecord
   end
 
   def percent_of_items_sold
-    ((total_items_sold.to_f / total_inventory_remaining.to_f)*100).round(2)
+    unless total_items_sold.nil?
+      ((total_items_sold.to_f / (total_items_sold + total_inventory_remaining).to_f)*100).round(2)
+    else
+      0
+    end
   end
+
 
   def top_states_by_items_shipped(limit)
     items.joins(:order_items)
@@ -155,5 +177,44 @@ class User < ApplicationRecord
 
   def used_coupon?(coupon)
     orders.where(coupon_id: coupon.id).exists?
+  end
+
+  def total_revenue_items
+  items.joins('join order_items on items.id = order_items.item_id')
+       .joins('join orders on orders.id = order_items.order_id')
+       .where('orders.status = 1')
+  end
+
+  def top_states_by_items_shipped_chart(limit)
+    chart = {}
+    top_states_by_items_shipped(limit).each do |item|
+      chart[item.state] = item.quantity
+    end
+    chart
+  end
+
+  def top_items_sold_by_quantity_chart(limit)
+    chart = {}
+    top_items_sold_by_quantity(limit).each do |item|
+      chart[item.name] = item.quantity
+    end
+    chart
+  end
+
+  def top_cities_by_items_shipped_chart(limit)
+    chart = {}
+    top_cities_by_items_shipped(limit).each do |item|
+      chart[item.city] = item.quantity
+    end
+    chart
+  end
+
+  def percent_of_items_sold_chart
+    unless total_items_sold.nil?
+      total_inventory = (total_items_sold + total_inventory_remaining)
+      chart = {"Total Inventory" => total_inventory, "Items Sold" => total_items_sold}
+    else
+      chart = {"Total Inventory" => total_inventory_remaining, "Items Sold" => 0}
+    end
   end
 end

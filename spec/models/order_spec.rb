@@ -88,10 +88,10 @@ RSpec.describe Order, type: :model do
 
       expect(@order.total_cost).to eq((@oi_1.quantity*@oi_1.price) + (@oi_2.quantity*@oi_2.price))
       expect(@order.total_cost).to eq(3)
-      @order.coupon = coupon
-      expect(@order.total_cost(coupon)).to eq(1)
-      @order.coupon = coupon_2
-      expect(@order.total_cost(coupon_2)).to eq(0.75)
+
+      user = create(:user)
+      order = create(:order, user: user, discounted_total: 3.0)
+      expect(order.total_cost(order.discounted_total)).to eq(0)
     end
 
     it '.total_quantity_for_merchant' do

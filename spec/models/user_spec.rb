@@ -99,6 +99,20 @@ RSpec.describe User, type: :model do
         expect(User.top_user_cities_by_order_count(3)[2].city).to eq("Fairfield")
         expect(User.top_user_cities_by_order_count(3)[2].order_count).to eq(1)
       end
+
+      it '.with_completed_orders' do
+        merchants_with_completed_orders = [@m1, @m2, @m3, @m6, @m7]
+        expect(User.with_completed_orders).to eq(merchants_with_completed_orders)
+      end
+
+      it '.total_sales' do
+        total_sales = { "Merchant Name 1" => 3.0,
+                       "Merchant Name 2" => 4.5,
+                       "Merchant Name 3" => 6.0,
+                       "Merchant Name 6" => 10.5,
+                       "Merchant Name 7" => 12.0 }
+        expect(User.total_sales).to eq(total_sales)
+      end
     end
   end
 
@@ -165,7 +179,9 @@ RSpec.describe User, type: :model do
     end
 
     it '.percent_of_items_sold' do
-      expect(@m1.percent_of_items_sold).to eq(19.40)
+      expect(@m1.percent_of_items_sold).to eq(16.25)
+      merchant_with_no_items_sold = create(:merchant)
+      expect(merchant_with_no_items_sold.percent_of_items_sold).to eq(0)
     end
 
     it '.top_states_by_items_shipped' do
@@ -233,5 +249,40 @@ RSpec.describe User, type: :model do
       expect(user_1.used_coupon?(coupon)).to eq(true)
       expect(user_2.used_coupon?(coupon)).to eq(false)
     end
+
+    it '.total_revenue_items' do
+      merchant_items_shipped = [@i1, @i2, @i2, @i3, @i4, @i6]
+      expect([@m1.total_revenue_items]).to include(merchant_items_shipped.flatten)
+    end
+
+    it '.top_states_by_items_shipped_chart' do
+      top_states = {"IA"=>13, "OK"=>8, "CO"=>5}
+
+      expect(@m1.top_states_by_items_shipped_chart(3)).to eq(top_states)
+    end
+
+    it '.top_items_sold_by_quantity_chart' do
+      top_items = {"Item Name 2"=>14, "Item Name 3"=>4, "Item Name 4"=>3}
+
+      expect(@m1.top_items_sold_by_quantity_chart(3)).to eq(top_items)
+    end
+
+    it '.top_cities_by_items_shipped_chart' do
+      top_cities = {"Fairfield"=>5, "OKC"=>8}
+
+      expect(@m1.top_cities_by_items_shipped_chart(3)).to eq(top_cities)
+    end
+
+    it '.percent_of_items_sold_chart' do
+      total_sold = {"Total Inventory"=>160, "Items Sold"=>26}
+
+      expect(@m1.percent_of_items_sold_chart).to eq(total_sold)
+
+      merchant_with_no_items_sold = create(:merchant)
+      no_sold = chart = {"Total Inventory" => 0, "Items Sold" => 0}
+      expect(merchant_with_no_items_sold.percent_of_items_sold_chart).to eq(no_sold)
+
+    end
+
   end
 end

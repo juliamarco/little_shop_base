@@ -56,7 +56,7 @@ RSpec.describe 'merchant dashboard statistics' do
 
   it 'shows percent of items sold' do
     within("#percent-of-items-sold") do
-      expect(page).to have_content("You have sold 26 items, 19.40% of your total inventory")
+      expect(page).to have_content("You have sold 26 items, 16.25% of your total inventory")
     end
   end
 

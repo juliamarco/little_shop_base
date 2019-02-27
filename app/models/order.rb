@@ -12,14 +12,12 @@ class Order < ApplicationRecord
     order_items.sum(:quantity)
   end
 
-  def total_cost(coupon = nil)
+  def total_cost(discounted_total = nil)
     original = order_items.pluck("sum(quantity*price)").sum
-    if coupon.nil?
+    if discounted_total.nil?
       total = original
-    elsif coupon.percentage?
-      total = ((original * coupon.dollar) / 100)
     else
-      total = (original - coupon.dollar)
+      total = (original - discounted_total)
     end
     [total, 0].max
   end

@@ -1,6 +1,10 @@
 <h1>Merchant List</h1>
 <%= tag.div class: "card" do %>
   <%= tag.section class: "statistics card-body float-left m-4" do %>
+  <%= tag.section id: "total-sales", class: "card-body float-left m-2" do %>
+    <h5 class="card-title">Total Sales</h5>
+    <p id="pie-chart-5"><%=  pie_chart @merchants.total_sales %></p>
+  <% end %>
     <%= tag.section id: "top-three-merchants-revenue", class: "card-body float-left m-2" do %>
       <h5 class="card-title">Top Merchants by Revenue</h5>
       <ul>

@@ -16,12 +16,4 @@ class CouponsController < ApplicationController
     redirect_to cart_path
   end
 
-  def destroy
-    if session[:coupon]
-      coupon = Coupon.find(session[:coupon])
-      session.delete(:coupon)
-    end
-    redirect_to cart_path
-  end
-
 end

@@ -183,6 +183,13 @@ RSpec.describe "merchant index workflow", type: :feature do
           expect(page).to have_content("Order #{@o3.id}: 8 items")
         end
       end
+
+      it 'shows chart for statistics' do
+        visit merchants_path
+
+          page.find(:css, "#pie-chart-5")
+      end
+      
     end
   end
 end

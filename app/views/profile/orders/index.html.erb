@@ -1,5 +1,4 @@
 <h1>User Order Index</h1>
-
 <% if @orders.empty? %>
   <p>You have no orders yet</p>
 <% else %>
@@ -12,11 +11,7 @@
           <p>Last Update: <%= order.updated_at %></p>
           <p>Status: <%= order.status %></p>
           <p>Item Count: <%= order.total_item_count %></p>
-          <% if order.coupon %>
-            <p>Total Cost: <%= number_to_currency(order.total_cost(order.coupon)) %></p>
-          <% else %>
-            <p>Total Cost: <%= number_to_currency(order.total_cost) %></p>
-          <% end %>
+          <p>Total Cost: <%= number_to_currency(order.total_cost(order.discounted_total)) %></p>
         <% end %>
       <% end %>
     <% end %>

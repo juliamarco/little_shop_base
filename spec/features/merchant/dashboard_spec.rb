@@ -98,5 +98,18 @@ RSpec.describe 'merchant dashboard' do
         expect(current_path).to eq(dashboard_coupons_path)
       end
     end
+
+    describe 'shows chart for statistics' do
+      scenario 'as a merchant' do
+        allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+        visit dashboard_path
+
+        page.find(:css, "#bar-chart-1")
+        page.find(:css, "#pie-chart-1")
+        page.find(:css, "#pie-chart-2")
+        page.find(:css, "#pie-chart-3")
+        page.find(:css, "#pie-chart-4")
+      end
+    end
   end
 end
