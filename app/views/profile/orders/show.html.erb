@@ -5,7 +5,8 @@
   <p>Status: <%= @order.status %></p>
   <p>Item Count: <%= @order.total_item_count %></p>
   <% if @order.coupon %>
-    <p>Total Cost: <%= number_to_currency(@order.total_cost(@order.coupon)) %></p>
+    <p>Discounted Total: <%= number_to_currency(@order.discounted_total) %></p>
+    <p>Total Cost: <%= number_to_currency(@order.total_cost(@order.discounted_total)) %></p>
     <p>Coupon used: '<%= @order.coupon.code %>'</p>
   <% else %>
     <p>Total Cost: <%= number_to_currency(@order.total_cost) %></p>

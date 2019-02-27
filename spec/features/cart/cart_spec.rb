@@ -227,7 +227,7 @@ RSpec.describe 'cart workflow', type: :feature do
       visit cart_path
       fill_in :coupon, with: @coupon.code
       click_button "Submit Coupon"
- 
+
       expect(page).to have_content("Coupon '#{@coupon.code}' successfully applied")
     end
 
@@ -299,7 +299,12 @@ RSpec.describe 'cart workflow', type: :feature do
       user = create(:user)
       order = create(:completed_order, user: user, coupon: @coupon)
 
-      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+      visit login_path
+
+      fill_in :email, with: user.email
+      fill_in :password, with: 'password'
+      click_button 'Log in'
+
       visit item_path(@item)
       click_button "Add to Cart"
       visit item_path(@item)
@@ -346,6 +351,30 @@ RSpec.describe 'cart workflow', type: :feature do
       click_button "Submit Coupon"
 
       expect(page).to have_content("Total: $0.00")
+    end
+
+    it "let's me check out and the order pages show the discount" do
+      coupon = @merchant.coupons.create!(code: "UJK", dollar: 150.0, percentage: true)
+
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+
+      visit cart_path
+      fill_in :coupon, with: coupon.code
+      click_button "Submit Coupon"
+
+      click_button "Check out"
+      expect(current_path).to eq(profile_orders_path)
+       expect(page).to have_content('You have successfully checked out!')
+
+       click_link "Order ID #{Order.last.id}"
+       expect(page).to have_content("Discounted Total: $3.00")
+       expect(page).to have_content("Total Cost: $0.00")
+       expect(page).to have_content("Coupon used: '#{coupon.code}'")
+
     end
   end
 end

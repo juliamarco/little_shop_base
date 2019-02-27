@@ -21,9 +21,16 @@
 
 <%= tag.div class: "card" do %>
   <%= tag.section class: "statistics card-body float-left m-4" do %>
+    <%= tag.section id: "total-revenue-by-month", class: "card-body float-left m-2" do %>
+      <h5 class="card-title">Total Revenue By Month</h5>
+      <ul>
+        <p id="bar-chart-1"><%= bar_chart @merchant.total_revenue_items.group_by_month(:created_at, format: "%b %Y").count %></p>
+      </ul>
+    <% end %>
     <%= tag.section id: "top-items-sold-by-quantity", class: "card-body float-left m-2" do %>
       <h5 class="card-title">Top Items Sold by Quantity</h5>
       <ul>
+        <p id="pie-chart-1"><%= pie_chart @merchant.top_items_sold_by_quantity_chart(5) %></p>
         <% @merchant.top_items_sold_by_quantity(5).each do |item| %>
           <li><%= link_to item.name, dashboard_item_path(item) %>: <%= item.quantity %></li>
         <% end %>
@@ -31,11 +38,13 @@
     <% end %>
     <%= tag.section id: "percent-of-items-sold", class: "card-body float-left m-2" do %>
       <h5 class="card-title">Sold Items Percentage</h5>
+        <p id="pie-chart-2"><%= pie_chart @merchant.percent_of_items_sold_chart %></p>
         <p> You have sold <%= pluralize(@merchant.total_items_sold, 'item') %>, <%= number_to_percentage(@merchant.percent_of_items_sold, precision: 2) %> of your total inventory</p>
     <% end %>
     <%= tag.section id: "top-states-by-items-shipped", class: "card-body float-left m-2" do %>
       <h5 class="card-title">Top States by Items Shipped</h5>
       <ul>
+        <p id="pie-chart-3"><%= pie_chart @merchant.top_states_by_items_shipped_chart(3) %></p>
         <% @merchant.top_states_by_items_shipped(3).each do |item| %>
           <li><%= item.state %>: <%= item.quantity %></li>
         <% end %>
@@ -44,6 +53,7 @@
     <%= tag.section id: "top-cities-by-items-shipped", class: "card-body float-left m-2" do %>
       <h5 class="card-title">Top Cities by Items Shipped</h5>
       <ul>
+        <p id="pie-chart-4"><%= pie_chart @merchant.top_cities_by_items_shipped_chart(3) %></p>
         <% @merchant.top_cities_by_items_shipped(3).each do |item| %>
           <li><%= item.city %>, <%= item.state %>: <%= item.quantity %></li>
         <% end %>
@@ -85,7 +95,6 @@
   <% end %>
   </p>
 </section>
-
 
 <% if @pending_orders %>
   <table class="table">

@@ -41,6 +41,24 @@ describe "Merchant Dashboard Coupons page" do
         expect(page).to have_button('Disable Coupon')
       end
     end
+
+    it "will render the form again if enter invalid options when creating" do
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+      @am_admin = false
+      visit dashboard_coupons_path
+      click_link 'Add New Coupon'
+
+      code = "AEIOU"
+      discount = "julia"
+
+      fill_in :code, with: code
+      select 'Percent', from: 'Type of discount'
+      fill_in "Amount", with: discount
+      click_button  'Create Coupon'
+
+      expect(page).to have_content("1 error prohibited this coupon from being saved: Dollar is not a number")
+    end
+
     it 'should allow me to add a new coupon with dollars' do
       allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
       @am_admin = false
@@ -133,6 +151,25 @@ describe "Merchant Dashboard Coupons page" do
         expect(page).to have_content("Coupon Code: New #{@coupon_1.code}")
         expect(page).to have_content("Coupon Discount: $123")
       end
+    end
+
+    it "will render the form again if enter invalid options when editing" do
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+      @am_admin = false
+      visit dashboard_coupons_path
+
+      within "#coupon-#{@coupon_1.id}" do
+        click_link 'Edit Coupon'
+      end
+
+      expect(current_path).to eq(edit_dashboard_coupon_path(@coupon_1))
+
+      fill_in :code, with: ('New ' + @coupon_1.code)
+      select 'Dollars', from: 'Type of discount'
+      fill_in "Amount", with: "hola"
+      click_button 'Update Coupon'
+
+      expect(page).to have_content("1 error prohibited this coupon from being saved")
     end
 
     it "lets me delete an existing coupon if it hasn't been used" do
