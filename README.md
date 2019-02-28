@@ -28,7 +28,7 @@ Top States By Items Shipped:
 
 Total Sales on the whole site:
 
-<img width="221" alt="screen shot 2019-02-28 at 10 48 14 am" src="https://user-images.githubusercontent.com/35079289/53587314-43ef8c00-3b47-11e9-9022-8b16969c1955.png">
+<img width="820" alt="screen shot 2019-02-28 at 10 26 38 am" src="https://user-images.githubusercontent.com/35079289/53587315-43ef8c00-3b47-11e9-9f94-77ef956e8437.png">
 
 ## Coupon Codes
 
